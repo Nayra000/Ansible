@@ -1,0 +1,20 @@
+---
+# tasks file for web
+- name: Install nginx
+  apt:
+    name: nginx
+    state: latest
+
+- name: Copy index file
+  copy:
+    src: index.html
+    dest: /var/www/html/index.html
+    owner: ansible
+    group: ansible
+    mode: 0755
+
+- name: change port number
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-enabled/default
+  notify: nginx-restart

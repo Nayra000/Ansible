@@ -1,0 +1,10 @@
+---
+# tasks file for db
+- name: Install PostgreSQL packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - "postgresql-client-14"
+    - "postgresql-14"
+  tags: install-postgress
