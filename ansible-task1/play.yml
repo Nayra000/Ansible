@@ -1,0 +1,64 @@
+- name: Update cache
+  hosts: all
+  tasks:
+    - name: Update apt cache 
+      apt:
+        update_cache: yes
+      when: ansible_facts['os_family'] == 'Debian'
+      tags: update-apt
+
+    - name: Update yum cache 
+      yum:
+        update_cache: yes
+      when: ansible_facts['os_family'] == 'Centos'
+      tags: update-yum
+
+    - name: install nginx on Ubuntu
+      apt: 
+        name: nginx
+        state: latest
+      when: ansible_facts['os_family'] == 'Debian'
+      tags: install-nginx-ubuntu
+
+    - name: install nginx on Centos
+      yum:
+        name: nginx
+        state: latest
+      when: ansible_facts['os_family'] == 'Centos'
+      tags: install-nginx-centos
+
+    - name: Change Nginx port number (Ubuntu)
+       copy:
+        src: ./default
+        dest: /etc/nginx/sites-enabled/
+      when: ansible_facts['os_family'] == 'Debian'
+      notify: restart_nginx 
+      tags: change-port-ubuntu
+     
+    - name: Change Nginx port number (Centos)
+      copy:
+        src: ./nginx.conf
+        dest: /etc/nginx/
+      when: ansible_facts['os_family'] == 'Centos'
+      notify: restart_nginx 
+      tags: change-port-centos
+
+    
+    - name: copy index.html
+      copy:
+        src: ./index.html
+        dest: /var/www/html
+      tags: copy-index
+
+    - name: print gather facts 
+      debug :
+          var: ansible_facts
+      tags : print-gather-facts
+
+  handlers:
+    - name: restart_nginx
+      service:
+        name: nginx
+        state: restarted
+
+
